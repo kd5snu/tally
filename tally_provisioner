@@ -1,0 +1,69 @@
+#!/bin/bash
+
+RASPI_IMAGE_FILE=./raspbian_lite_latest.zip
+
+if [[ ! -f "$RASPI_IMAGE_FILE" ]]
+then
+	echo "Downloading RasPi image."
+	wget -O raspbian_lite_latest.zip https://downloads.raspberrypi.org/raspbian_lite_latest
+else
+	read -p "RasPi Lite image exists - use it? " userInput1
+	if [[ $userInput1 == 'n' ]]
+	then
+		read -p "Download new copy? " userInput2
+			if [[ $userInput2 == 'y' ]]
+			then
+				echo "Downlading new copy of RasPi Lite."
+				wget -O raspbian_lite_latest.zip https://downloads.raspberrypi.org/raspbian_lite_latest
+			else
+				echo "Exiting."
+				exit
+			fi
+	else
+		echo "Using existing file."
+	fi
+fi
+
+
+unzip $RASPI_IMAGE_FILE
+
+echo ""
+echo "Mapping boot and root partitions."
+sudo kpartx -a -v *.img
+
+if [[ -d ./bootmnt ]]
+then
+	echo "Removing old 'bootmnt/'."
+	# rm -r ./bootmnt
+fi
+	echo "Creating and mounting 'bootmnt/'."
+	# mkdir bootmnt
+	# sudo mount /dev/mapper/loop0p1 bootmnt/
+
+if [[ -d ./rootmnt ]]
+then
+	echo "Removing old 'rootmnt/'."
+	# rm -r ./rootmnt
+fi
+	echo "Creating and mounting 'rootmnt/'."
+	# mkdir rootmnt
+	# sudo mount /dev/mapper/loop0p2 rootmnt/
+
+echo ""
+echo "Creating new Pi NFS and TFTP folders."
+
+piSerialFirst = "one"
+piSerialSecond = "two"
+
+while [[ ${piSerialFirst} != ${piSerialSecond} ]]
+do
+	read -p "What is the Serial Number of the Pi?" piSerialFirst
+	read -p "Please confirm." piSerialSecond
+
+	if [[ $piSerialFirst == $piSerialSecond ]]
+	then
+		echo "Serials match. Building boot directories..."
+	else
+		echo "Serials don't match."
+	fi
+done

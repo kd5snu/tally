@@ -1,0 +1,14 @@
+#!/bin/bash
+
+read -p "Serial? " testSerial
+read -p "Hostname? " testHostname
+
+echo ${testSerial}
+echo ${testHostname}
+
+if [[ -d "/srv/nfs/${testHostname}-${testSerial}" ]]
+then
+	echo "Exists."
+else
+	echo "Doesn't exist."
+fi
